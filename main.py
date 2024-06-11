@@ -1,8 +1,9 @@
 # SQLSEQUEL - A NEW DATABASE LANGUAGE
-# [==============================] INDICATES END OF CODE SECTION
 # THIS SOFTWARE IS BASED LOOSELY OFF OF SQL.
 # IT UTILISES A 2D ARRAY CONSISTING OF LISTS WITHIN A LIST.
-# I PLAN TO ADD .CSV EXPORT AT A LATER DATE.
+
+# I PLAN TO ADD .CSV EXPORT AT A LATER DATE. 
+# UPDATE - THIS HAS BEEN REPLACED WITH TXT EXPORTED AND A PARSER.
 
 # INITIALISES 2D ARRAY FOR DATA STORAGE
 
@@ -11,18 +12,15 @@ database = [
     # INDEX ROW TO PREVENT INDEX ERROR
     
     []
-
-    # [==============================]
     
 ]
-
-# [==============================]
 
 # DEFINES HEADERS OF TABLE, AND HENCE NUMBER OF COLUMNS
 
 def init():
 
     # UNTIL A FLAG MANUALLY QUITS THE INITIATION, ADD FIELDS.
+    
     while True:
         fieldName = ""        
         
@@ -30,64 +28,24 @@ def init():
 or STOP to stop.")
 
         # STOP ADDING RECORDS, PROCEED TO RUNTIME
+        
         if fieldName == "STOP":
             return 0
 
-        # IMPORT table.txt
+        # OR WE COULD IMPORT table.txt
+        
         if fieldName == "IMPORTTABLE":
             importTable()
 
         # OTHERWISE, ADD THE FIELD TO THE INDEX ROW
+        
         if fieldName != "IMPORTTABLE":
             database[0].append(fieldName)
 
+            # DON'T FORGET TO PAD THE OTHER RECORDS
+
             for i in range(1, len(database)):
                 database[i].append("")
-
-# [==============================]
-
-# DISPLAYS THE TABLE
-
-def displayTable():
-    for i in database:
-        print(i)
-
-# [==============================]
-
-# SAVE TABLE
-
-def save():
-    
-    # OPENS TABLE STORAGE FILE AND OVERWRITES A BLANK
-    f = open("table.txt", "wt")
-    f.write("")
-    f.close()
-
-    # OPENS IN APPEND MODE TO ADD CURRENT DATA
-    f = open("table.txt", "at")
-
-    # FOR THE LENGTH OF THE DATABASE:
-    for i in range(0, len(database)):
-
-        # SET THE FIRST PART OF THE STRING TO WRITE
-        lineToWrite = str(database[i][0])
-
-        # FOR THE LENGTH OF THE ROW, EXCLUDING FIRST WORD
-        for j in range(1, len(database[i])):
-
-            # APPEND TO WRITE CONTAINER
-            lineToWrite = lineToWrite + " " + database[i][j]
-
-        # WRITE TO TEXT FILE
-        f.write(lineToWrite)
-
-        if i != (len(database) - 1):
-            f.write("\n")
-    
-    # TIDY UP
-    f.close()
-                
-# [==============================]
 
 # IMPORT TABLE
 
@@ -113,23 +71,28 @@ def importTable():
         for i in range(1, len(database)):
 
             # IF THE ROW IS SHORTER, ADD SOME FIELDS
+            
             if len(database[i]) < len(database[0]):
 
                 # FOR J IN THE RANGE 0 to DISPARITY IN FIELDS
+                
                 for j in range(0, (len(database[0]) - len(database[i]))):
                     # ADD EMPTY TO THE END
                     database[i].append("")
 
             # IF THE ROW IS LONGER, POP FIELD FROM END
+            
             if len(database[0]) < len(database[i]):
 
                 # FOR J IN THE RANGE DISPARITY TO 0
+                
                 for j in range(len(database[i]) - len(database[0]), 0, -1):
                     database[i].pop(-1)
         
         f.close()
     
     # NO PRE EXISTING TABLE
+    
     except FileNotFoundError:
         print("table.txt file not found.")
 
@@ -139,7 +102,11 @@ def importTable():
 
 interpretedCommand = ""
 
-# [==============================]
+# DISPLAYS THE TABLE
+
+def displayTable():
+    for i in database:
+        print(i)
 
 # MODIFIES FIELD IN RECORD
 
@@ -154,8 +121,6 @@ def modify():
         if interpretedCommand[2] != "IN":
             print("Syntax Error")
             return 0
-
-    # [==============================]
         
         # CARRIES OUT RECORD MODIFICATION. CHECKS FOR EXISTENCE OF FIELD.
 
@@ -163,25 +128,17 @@ def modify():
             database[int(interpretedCommand[3])][database[0].index(
             interpretedCommand[1])] = interpretedCommand[4]
 
-        # [==============================]
-
         # THROWS EXCEPTION
         
         except ValueError:
             print("Field does not exist.")
             return 0
-        
-        # [==============================]
     
     # THROWS EXCEPTION
     
     except IndexError:
         print("Syntax Error. MODIFY (field) IN (record) (content)")
         return 0
-
-    # [==============================]
-
-# [==============================]
 
 # DELETES CONTENT OF DATABASE, EXCLUDING TITLE INDEX
 
@@ -192,11 +149,7 @@ def dropTable():
             database[i][j] = ""
     return 0
 
-# [==============================]
-
 # RETURNS CERTAIN FIELDS
-
-# TODO: return the actual field, this is a bit broken
 
 def select():
     global interpretedCommand
@@ -216,27 +169,17 @@ def select():
                 
             try:
                 print(database[int(interpretedCommand[3])][database[0].index(interpretedCommand[1])])
-
-            # [==============================]
                 
             # THROWS EXCEPTION
                 
             except IndexError:
                 print("Field not found.")
-
-                # [==============================]
-    
-    # [==============================]
     
     # THROWS EXCEPTION
     
     except IndexError:
         print("Syntax Error. SELECT (field) FROM (record).", 
               "Use * to select an entire record.")
-
-    # [==============================]
-
-# [==============================]
 
 # ADDS A RECORD TO THE TABLE
 
@@ -250,10 +193,75 @@ def addRecord():
     for i in range(len(database[0])):
         database[-1].append("")
 
-    # [==============================]
+# SAVE TABLE
 
-# [==============================]
+def save():
 
+    # OPENS TABLE STORAGE FILE AND OVERWRITES A BLANK
+
+    f = open("table.txt", "wt")
+    f.write("")
+    f.close()
+
+    # OPENS IN APPEND MODE TO ADD CURRENT DATA
+
+    f = open("table.txt", "at")
+
+    # PREVENTS "DATA SHIFTS" BY REPLACING BLANKS WITH NULL.
+
+    for i in range(0, len(database)):
+        for j in range(0, len(database[i])):
+            if database[i][j] == "":
+                database[i][j] = "NULL"
+
+    # FOR THE LENGTH OF THE DATABASE:
+
+    for i in range(0, len(database)):
+
+        # SET THE FIRST PART OF THE STRING TO WRITE
+
+        lineToWrite = str(database[i][0])
+
+        # FOR THE LENGTH OF THE ROW, EXCLUDING FIRST WORD
+
+        for j in range(1, len(database[i])):
+
+            # APPEND TO WRITE CONTAINER
+
+            lineToWrite = lineToWrite + " " + database[i][j]
+
+        # WRITE TO TEXT FILE
+
+        f.write(lineToWrite)
+
+        if i != (len(database) - 1):
+            f.write("\n")
+
+    # TIDY UP
+
+    f.close()
+
+# SEARCH FOR A CERTAIN STRING IN A CERTAIN FIELD
+
+def search():
+    try:
+        if interpretedCommand[1] != "FOR":
+            print("Syntax Error")
+            return 0
+
+        resultsArray = []
+        columnNumber = database[0].index(interpretedCommand[2])
+        searchQuery = interpretedCommand[3]
+
+        for i in range(1, len(database)):
+            if database[i][columnNumber] == searchQuery:
+                resultsArray.append(i)
+
+        print(resultsArray)
+
+    except IndexError:
+        print("Syntax Error")
+        
 # LAUNCHES RUNTIME ENVIRONMENT TO RUN COMMANDS IN. LOOPS BACK INTO ITSELF.
 
 def runtime():
@@ -277,17 +285,15 @@ def runtime():
         elif interpretedCommand[0] == "SAVE":
             save()
             displayTable()
+        elif interpretedCommand[0] == "SEARCH":
+            search()
         else:
             print("Command Unknown")
     except IndexError:
         print("Command Unknown")
-
-# [==============================]
 
 # RUNS THE CODE, BOTH INITIATION AND RUNTIME.
 
 init()
 while True:
     runtime()
-
-# [==============================]
