@@ -38,6 +38,12 @@ Returns the content of the selected field in the selected record. If * is used i
 
 ADDRECORD:
 
-Syntex: ADDRECORD
+Syntax: ADDRECORD
 
 Adds a new record to the end of the table.
+
+SEARCH:
+
+Syntax: SEARCH FOR (field) (content)
+
+Returns an array containing the row number of records that contain a field with matching content.
