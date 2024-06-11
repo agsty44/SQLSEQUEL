@@ -21,16 +21,28 @@ database = [
 # DEFINES HEADERS OF TABLE, AND HENCE NUMBER OF COLUMNS
 
 def init():
-    fieldName = ""
-    while fieldName != "STOP":
+
+    # UNTIL A FLAG MANUALLY QUITS THE INITIATION, ADD FIELDS.
+    while True:
+        fieldName = ""        
+        
         fieldName = input("Enter the field name, IMPORTTABLE to use an existing table, \
 or STOP to stop.")
+
+        # STOP ADDING RECORDS, PROCEED TO RUNTIME
         if fieldName == "STOP":
             return 0
+
+        # IMPORT table.txt
         if fieldName == "IMPORTTABLE":
             importTable()
-            return 0
-        database[0].append(fieldName)
+
+        # OTHERWISE, ADD THE FIELD TO THE INDEX ROW
+        if fieldName != "IMPORTTABLE":
+            database[0].append(fieldName)
+
+            for i in range(1, len(database)):
+                database[i].append("")
 
 # [==============================]
 
@@ -80,7 +92,48 @@ def save():
 # IMPORT TABLE
 
 def importTable():
-    pass
+
+    # OPEN THE table.txt FILE
+    try:
+        global database
+        
+        f = open("table.txt", "rt")
+
+        database = []
+        
+        wholeTableString = f.read()
+        lineByLine = wholeTableString.splitlines()
+
+        # THIS MAKES A 2D ARRAY FROM THE FILE.
+        for i in lineByLine:
+            database.append(i.split())
+
+        # MAKE SURE THAT EACH RECORD HAS THE SAME NUMBER OF FIELDS AS THE INDEX ROW
+
+        for i in range(1, len(database)):
+
+            # IF THE ROW IS SHORTER, ADD SOME FIELDS
+            if len(database[i]) < len(database[0]):
+
+                # FOR J IN THE RANGE 0 to DISPARITY IN FIELDS
+                for j in range(0, (len(database[0]) - len(database[i]))):
+                    # ADD EMPTY TO THE END
+                    database[i].append("")
+
+            # IF THE ROW IS LONGER, POP FIELD FROM END
+            if len(database[0]) < len(database[i]):
+
+                # FOR J IN THE RANGE DISPARITY TO 0
+                for j in range(len(database[i]) - len(database[0]), 0, -1):
+                    database[i].pop(-1)
+        
+        f.close()
+    
+    # NO PRE EXISTING TABLE
+    except FileNotFoundError:
+        print("table.txt file not found.")
+
+    print(database)
 
 # ESTABLISHES THE INTERPRETATION VARIABLE
 
