@@ -45,8 +45,36 @@ def displayTable():
 # SAVE TABLE
 
 def save():
-    pass
+    
+    # OPENS TABLE STORAGE FILE AND OVERWRITES A BLANK
+    f = open("table.txt", "wt")
+    f.write("")
+    f.close()
 
+    # OPENS IN APPEND MODE TO ADD CURRENT DATA
+    f = open("table.txt", "at")
+
+    # FOR THE LENGTH OF THE DATABASE:
+    for i in range(0, len(database)):
+
+        # SET THE FIRST PART OF THE STRING TO WRITE
+        lineToWrite = str(database[i][0])
+
+        # FOR THE LENGTH OF THE ROW, EXCLUDING FIRST WORD
+        for j in range(1, len(database[i])):
+
+            # APPEND TO WRITE CONTAINER
+            lineToWrite = lineToWrite + " " + database[i][j]
+
+        # WRITE TO TEXT FILE
+        f.write(lineToWrite)
+
+        if i != (len(database) - 1):
+            f.write("\n")
+    
+    # TIDY UP
+    f.close()
+                
 # [==============================]
 
 # IMPORT TABLE
@@ -153,9 +181,6 @@ def select():
         print("Syntax Error. SELECT (field) FROM (record).", 
               "Use * to select an entire record.")
 
-    except: # CATCH ALL FOR OTHER ISSUES
-        print("idk what happened lol")
-
     # [==============================]
 
 # [==============================]
@@ -192,10 +217,12 @@ def runtime():
             dropTable()
             displayTable()
         elif interpretedCommand[0] == "SELECT":
-            select() # I HAVE NO IDEA WHY THIS DOESN'T WORK.
-            #displayTable()
+            select()
         elif interpretedCommand[0] == "ADDRECORD":
             addRecord()
+            displayTable()
+        elif interpretedCommand[0] == "SAVE":
+            save()
             displayTable()
         else:
             print("Command Unknown")
