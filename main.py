@@ -1,3 +1,7 @@
+# SQLSEQUEL VER 4
+
+# MAIN BRANCH
+
 # SQLSEQUEL - A NEW DATABASE LANGUAGE
 # THIS SOFTWARE IS BASED LOOSELY OFF OF SQL.
 # IT UTILISES A 2D ARRAY CONSISTING OF LISTS WITHIN A LIST.
@@ -193,6 +197,7 @@ def select():
             # BY TAKING THE LAST 3 OF THE FULL COMMAND
 
             # TRY ADDING THE LAST 3
+            
             try:
                 for i in range(0, 3):
                     evalSubArray.append(interpretedCommand[i + 3])
@@ -206,52 +211,66 @@ def select():
                 try:
 
                     # GET THE INDEX OF THE FIELD IN INDEX ROW
+                    
                     conditionToCheck = database[0].index(evalSubArray[0])
 
                 # IF IT DOESN'T EXIST
+                
                 except ValueError:
                     print("Condition does not match database.")
                     return 1
 
                 # MAKE AN ARRAY TO STORE RECORDS MATCHING THE CONDITION
+                
                 resultsArray = []
 
                 # IF OUR EVAL IS FIELD EQUALS CONTENT:
+                
                 if evalSubArray[1] == "==":
 
                     # FOR EVERY ROW IN THE DATABASE
+                
                     for i in range(0, len(database)):
 
                         # CHECK THE FIELD IN THE RECORD AND SEE IF IT EQUALS THE CONTENT
+                    
                         if database[i][conditionToCheck] == evalSubArray[2]:
 
                             # ADD THE RECORD TO THE ARRAY IF IT DOES
+                        
                             resultsArray.append(i)
 
                 # OR IF THE EVAL IS FIELD NOT EQUALS CONTENT
+                
                 elif evalSubArray[1] == "!=":
 
                     # FOR EVERY ROW IN THE DATABASE
+                
                     for i in range(0, len(database)):
 
                         # CHECK THE FIELD IN THE RECORD 
                         # AND SEE IF IT DOESN'T EQUAL THE CONTENT
+                    
                         if database[i][conditionToCheck] != evalSubArray[2]:
 
                             # ADD THE RECORD TO THE ARRAY IF THIS IS TRUE
+                        
                             resultsArray.append(i)
 
                 # IF THE OPERATOR ISNT EQUALS OR NOT EQUALS
+                
                 else:
                     print("Cannot evaluate condition. Use == or !=.")
                     return 1
 
                 # IF THEY WANT THE WHOLE RECORD
+                
                 if interpretedCommand[1] == "*":
 
                     for i in resultsArray:
 
                         # PRINT ALL RECORDS THAT MATCHED OUR CONDITIONS
+                
                         print(database[i])
 
                 else:
@@ -259,9 +278,11 @@ def select():
                     for i in resultsArray:
 
                         # OR PRINT THE SPECIFIC FIELD THEY ASKED FOR
+                        
                         print(database[i][database[0].index(interpretedCommand[1])])
 
             # IF THE EVAL STRING IS TOO SHORT
+            
             except IndexError:
                 print("Cannot evaluate condition. Syntax: (field) (== or !=) (content).")
                 return 1
@@ -388,5 +409,6 @@ def runtime():
 # RUNS THE CODE, BOTH INITIATION AND RUNTIME.
 
 init()
+
 while True:
     runtime()

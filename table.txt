@@ -1,0 +1,6 @@
+FirstName LastName UserID Country Town StreetName HouseNo ZIPorPOSTCODE
+Joe Stevenson 1 UnitedKingdom Dorchester GovernmentRd 73 DC420XQ
+Geoffery Marley 2 Spain Madrid BlancRd 292 09928
+Jim Picker 3 UnitedKingdom Dundee HighSt 11 DD921FB
+Henry Bob 4 Germany Zurich LangSt 3947 95281
+Paul Pittering 5 UnitedKingdom Dorchester SouthRd 22 DC420VD
