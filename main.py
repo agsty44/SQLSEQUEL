@@ -95,6 +95,7 @@ def importTable():
     
     except FileNotFoundError:
         print("table.txt file not found.")
+        return 1
 
     print(database)
 
@@ -120,7 +121,7 @@ def modify():
         
         if interpretedCommand[2] != "IN":
             print("Syntax Error")
-            return 0
+            return 1
         
         # CARRIES OUT RECORD MODIFICATION. CHECKS FOR EXISTENCE OF FIELD.
 
@@ -132,13 +133,13 @@ def modify():
         
         except ValueError:
             print("Field does not exist.")
-            return 0
+            return 1
     
     # THROWS EXCEPTION
     
     except IndexError:
         print("Syntax Error. MODIFY (field) IN (record) (content)")
-        return 0
+        return 1
 
 # DELETES CONTENT OF DATABASE, EXCLUDING TITLE INDEX
 
@@ -147,7 +148,7 @@ def dropTable():
     for i in range(1, len(database)):
         for j in range(len(database[i])):
             database[i][j] = ""
-    return 0
+    return 1
 
 # RETURNS CERTAIN FIELDS
 
@@ -158,28 +159,119 @@ def select():
     # CHECKS SYNTAX AND ARGUMENTS
     
     try:
-        if interpretedCommand[2] != "FROM":
+        if interpretedCommand[2] != "FROM" and interpretedCommand[2] != "WHERE":
             print("Syntax Error")
-            return 0
-        if interpretedCommand[1] == "*":
-            print(database[int(interpretedCommand[3])])
-        else:
+            return 1
 
-            # ATTEMPTS TO RETURN FIELDS
+        # SELECT FIELD IN A RECORD
+        
+        if interpretedCommand[2] == "FROM":
+            if interpretedCommand[1] == "*":
+                print(database[int(interpretedCommand[3])])
+            else:
+
+                # ATTEMPTS TO RETURN FIELDS
                 
-            try:
-                print(database[int(interpretedCommand[3])][database[0].index(interpretedCommand[1])])
+                try:
+                    print(database[int(interpretedCommand[3])][database[0].index(interpretedCommand[1])])
                 
-            # THROWS EXCEPTION
+                # THROWS EXCEPTION
                 
-            except IndexError:
-                print("Field not found.")
+                except IndexError:
+                    print("Field not found.")
+                    return 1
+
+        # SELECT RECORDS THAT MEET A SPECIFIC CONDITION
+        
+        elif interpretedCommand[2] == "WHERE":
+
+            # MAKE A SUB ARRAY TO SIMPLIFY PARSING
     
-    # THROWS EXCEPTION
+            evalSubArray = []
+
+            # ADD THE 3 SECTIONS OF THE EVAL SUB ARRAY
+            # BY TAKING THE LAST 3 OF THE FULL COMMAND
+
+            # TRY ADDING THE LAST 3
+            try:
+                for i in range(0, 3):
+                    evalSubArray.append(interpretedCommand[i + 3])
+
+            except IndexError:
+                print("Cannot evaluate condition. Syntax: (field) (== or !=) (content).")
+                return 1
+            
+            try:
+
+                try:
+
+                    # GET THE INDEX OF THE FIELD IN INDEX ROW
+                    conditionToCheck = database[0].index(evalSubArray[0])
+
+                # IF IT DOESN'T EXIST
+                except ValueError:
+                    print("Condition does not match database.")
+                    return 1
+
+                # MAKE AN ARRAY TO STORE RECORDS MATCHING THE CONDITION
+                resultsArray = []
+
+                # IF OUR EVAL IS FIELD EQUALS CONTENT:
+                if evalSubArray[1] == "==":
+
+                    # FOR EVERY ROW IN THE DATABASE
+                    for i in range(0, len(database)):
+
+                        # CHECK THE FIELD IN THE RECORD AND SEE IF IT EQUALS THE CONTENT
+                        if database[i][conditionToCheck] == evalSubArray[2]:
+
+                            # ADD THE RECORD TO THE ARRAY IF IT DOES
+                            resultsArray.append(i)
+
+                # OR IF THE EVAL IS FIELD NOT EQUALS CONTENT
+                elif evalSubArray[1] == "!=":
+
+                    # FOR EVERY ROW IN THE DATABASE
+                    for i in range(0, len(database)):
+
+                        # CHECK THE FIELD IN THE RECORD 
+                        # AND SEE IF IT DOESN'T EQUAL THE CONTENT
+                        if database[i][conditionToCheck] != evalSubArray[2]:
+
+                            # ADD THE RECORD TO THE ARRAY IF THIS IS TRUE
+                            resultsArray.append(i)
+
+                # IF THE OPERATOR ISNT EQUALS OR NOT EQUALS
+                else:
+                    print("Cannot evaluate condition. Use == or !=.")
+                    return 1
+
+                # IF THEY WANT THE WHOLE RECORD
+                if interpretedCommand[1] == "*":
+
+                    for i in resultsArray:
+
+                        # PRINT ALL RECORDS THAT MATCHED OUR CONDITIONS
+                        print(database[i])
+
+                else:
+
+                    for i in resultsArray:
+
+                        # OR PRINT THE SPECIFIC FIELD THEY ASKED FOR
+                        print(database[i][database[0].index(interpretedCommand[1])])
+
+            # IF THE EVAL STRING IS TOO SHORT
+            except IndexError:
+                print("Cannot evaluate condition. Syntax: (field) (== or !=) (content).")
+                return 1
+    
+    # THROWS EXCEPTION IF ANYTHING ELSE IS MISSING
     
     except IndexError:
-        print("Syntax Error. SELECT (field) FROM (record).", 
+        print("Syntax Error. SELECT (field) FROM (record), or SELECT (field) WHERE (condition)", 
               "Use * to select an entire record.")
+        return 1
 
 # ADDS A RECORD TO THE TABLE
 
@@ -247,7 +339,7 @@ def search():
     try:
         if interpretedCommand[1] != "FOR":
             print("Syntax Error")
-            return 0
+            return 1
 
         resultsArray = []
         columnNumber = database[0].index(interpretedCommand[2])
@@ -261,6 +353,7 @@ def search():
 
     except IndexError:
         print("Syntax Error")
+        return 1
         
 # LAUNCHES RUNTIME ENVIRONMENT TO RUN COMMANDS IN. LOOPS BACK INTO ITSELF.
 
