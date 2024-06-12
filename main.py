@@ -1,4 +1,4 @@
-# SQLSEQUEL VER 4
+# SQLSEQUEL VER 5
 
 # MAIN BRANCH
 
@@ -19,9 +19,12 @@ database = [
     
 ]
 
+autosaveFlag = 0
+
 # DEFINES HEADERS OF TABLE, AND HENCE NUMBER OF COLUMNS
 
 def init():
+    global autosaveFlag
 
     # UNTIL A FLAG MANUALLY QUITS THE INITIATION, ADD FIELDS.
     
@@ -34,7 +37,7 @@ or STOP to stop.")
         # STOP ADDING RECORDS, PROCEED TO RUNTIME
         
         if fieldName == "STOP":
-            return 0
+            break
 
         # OR WE COULD IMPORT table.txt
         
@@ -50,6 +53,12 @@ or STOP to stop.")
 
             for i in range(1, len(database)):
                 database[i].append("")
+
+    autosave = input("Would you like to enable autosave for this session? \
+Type \"yes\" for yes, and \"no\" for no.")
+
+    if autosave.lower() == "yes":
+        autosaveFlag = 1
 
 # IMPORT TABLE
 
@@ -111,7 +120,10 @@ interpretedCommand = ""
 
 def displayTable():
     for i in database:
-        print(i)
+        if database.index(i) == 0:
+            print("Index Row: ", i)
+        else:
+            print("Record Number", database.index(i), i)
 
 # MODIFIES FIELD IN RECORD
 
@@ -359,7 +371,7 @@ def save():
 def search():
     try:
         if interpretedCommand[1] != "FOR":
-            print("Syntax Error")
+            print("Syntax Error. SEARCH FOR (field) (content)")
             return 1
 
         resultsArray = []
@@ -373,13 +385,72 @@ def search():
         print(resultsArray)
 
     except IndexError:
-        print("Syntax Error")
+        print("Syntax Error. SEARCH FOR (field) (content)")
         return 1
+
+# SEARCHES FOR FILLED IN FIELDS
+
+def count():
+
+    count = 0
+    countArray = []
+    
+    try:
+
+        # INVALID FIELD
         
+        if interpretedCommand[1] != "*" and interpretedCommand[1] not in database[0]:
+            print("Field not in database. Use * for all fields or a specific fieldname.")
+            return 1
+
+        # IF WE WANT ALL FIELDS COUNTED
+        
+        if interpretedCommand[1] == "*":
+
+            # FOR EACH COLUMN
+            
+            for i in range(0, len(database[0])):
+
+                # FOR EACH ROW
+                
+                for j in range(1, len(database)):
+                    
+                    # IF DATA IS PRESENT INCREASE THE COUNT
+                    if database[j][i] != "NULL" and database[j][i] != "":
+                        count += 1
+
+                # APPEND IT TO THE LIST
+                
+                countArray.append(count)
+
+                #RESET FOR NEXT LOOP
+                
+                count = 0
+
+            print(database[0])
+            print(countArray)
+            return 0
+
+        else:
+
+            columnToCheck = database[0].index(interpretedCommand[1])
+
+            for i in range(1, len(database)):
+                if (database[i][columnToCheck] != "NULL" and 
+                    database[i][columnToCheck] != ""):
+                    count += 1
+
+            print(database[columnToCheck])
+            print(count)
+            return 0
+
+    except IndexError:
+        print("Syntax Error. Syntax: COUNT (field)")
+                    
 # LAUNCHES RUNTIME ENVIRONMENT TO RUN COMMANDS IN. LOOPS BACK INTO ITSELF.
 
 def runtime():
-    global interpretedCommand
+    global autosaveFlag, interpretedCommand
 
     cmd = input()
     interpretedCommand = cmd.split()
@@ -401,10 +472,15 @@ def runtime():
             displayTable()
         elif interpretedCommand[0] == "SEARCH":
             search()
+        elif interpretedCommand[0] == "COUNT":
+            count()
         else:
             print("Command Unknown")
     except IndexError:
         print("Command Unknown")
+
+    if autosaveFlag == 1:
+        save()
 
 # RUNS THE CODE, BOTH INITIATION AND RUNTIME.
 

@@ -54,6 +54,12 @@ Syntax: SEARCH FOR (field) (content)
 
 Returns an array containing the row number of records that contain a field with matching content.
 
+#### COUNT:
+
+Syntax: COUNT (field)
+
+Counts the number of rows with data in a specified field. If * is used in (field), an array containing the count function of each field will be returned.
+
 ### Learning SQLSEQUEL
 
 #### Included table
