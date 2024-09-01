@@ -12,7 +12,9 @@ From here you can add fields, import an existing table (table.txt), or stop addi
 
 #### If you type IMPORTTABLE:
 
-The table provided in **table.txt** will be imported. No other file can be imported, it must be named **table.txt**. You will be given the opportunity to add additional fields. All records will be preserved.
+~~The table provided in **table.txt** will be imported. No other file can be imported, it must be named **table.txt**. You will be given the opportunity to add additional fields. All records will be preserved.~~
+
+You will be given an opportunity to state the file name of the table (sans the ".sequel" extension, e.g "tables/customers" will open the file in tables named customers.sequel)
 
 #### If you type STOP:
 
@@ -40,7 +42,7 @@ Deletes the content of all fields in all records. Keeps number of records and in
 
 Syntax: SELECT (field) FROM (record number), or SELECT (field) WHERE (field) (== or !=) (content)
 
-Returns the content of the selected field in the selected record. If * is used in (field), it returns the whole records.
+Returns the content of the selected field in the selected record. If * is used in (field), it returns the whole record(s).
 
 #### ADDRECORD:
 

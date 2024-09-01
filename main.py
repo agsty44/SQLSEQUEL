@@ -7,7 +7,8 @@
 # IT UTILISES A 2D ARRAY CONSISTING OF LISTS WITHIN A LIST.
 
 # I PLAN TO ADD .CSV EXPORT AT A LATER DATE. 
-# UPDATE - THIS HAS BEEN REPLACED WITH TXT EXPORTED AND A PARSER.
+# UPDATE - THIS HAS BEEN REPLACED WITH .txt EXPORTS AND A PARSER.
+# UPDATE UPDATE - THIS NOW USES .sequel, A PROPRIETARY FILE TYPE
 
 # INITIALISES 2D ARRAY FOR DATA STORAGE
 
@@ -67,8 +68,12 @@ def importTable():
     # OPEN THE table.txt FILE
     try:
         global database
-        
-        f = open("table.txt", "rt")
+
+        tablename = input("What is the filename of your table?")
+
+        tablename = tablename + ".sequel"
+
+        f = open(tablename, "rt")
 
         database = []
         
@@ -107,7 +112,7 @@ def importTable():
     # NO PRE EXISTING TABLE
     
     except FileNotFoundError:
-        print("table.txt file not found.")
+        print("Table file not found.")
         return 1
 
     print(database)
@@ -215,7 +220,8 @@ def select():
                     evalSubArray.append(interpretedCommand[i + 3])
 
             except IndexError:
-                print("Cannot evaluate condition. Syntax: (field) (== or !=) (content).")
+                print("Cannot evaluate condition.", 
+                      "Syntax: (field) (== or !=) (content).")
                 return 1
             
             try:
@@ -296,13 +302,15 @@ def select():
             # IF THE EVAL STRING IS TOO SHORT
             
             except IndexError:
-                print("Cannot evaluate condition. Syntax: (field) (== or !=) (content).")
+                print("Cannot evaluate condition.", 
+                      "Syntax: (field) (== or !=) (content).")
                 return 1
     
     # THROWS EXCEPTION IF ANYTHING ELSE IS MISSING
     
     except IndexError:
-        print("Syntax Error. SELECT (field) FROM (record), or SELECT (field) WHERE (condition)", 
+        print("Syntax Error. SELECT (field) FROM (record),", 
+              "or SELECT (field) WHERE (condition)", 
               "Use * to select an entire record.")
         return 1
 
@@ -400,7 +408,8 @@ def count():
         # INVALID FIELD
         
         if interpretedCommand[1] != "*" and interpretedCommand[1] not in database[0]:
-            print("Field not in database. Use * for all fields or a specific fieldname.")
+            print("Field not in database.", 
+                  "Use * for all fields or a specific fieldname.")
             return 1
 
         # IF WE WANT ALL FIELDS COUNTED
@@ -450,7 +459,7 @@ def count():
 # LAUNCHES RUNTIME ENVIRONMENT TO RUN COMMANDS IN. LOOPS BACK INTO ITSELF.
 
 def runtime():
-    global autosaveFlag, interpretedCommand
+    global interpretedCommand
 
     cmd = input()
     interpretedCommand = cmd.split()
